@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#071b4b">
+<meta name="description" content="高校化学の高分子・糖類を楽しく学ぶ無料学習ゲーム">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<title>高分子マスター</title>
+<style>
+:root{color-scheme:dark;--bg:#07142f;--panel:#10254b;--panel2:#142d59;--line:#294775;--txt:#f3f7ff;--muted:#a9bddc;--cyan:#35c7f4;--purple:#a78bfa;--green:#47d7a0;--red:#ff8585}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#123b78 0,transparent 42%),var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;min-height:100vh}
+main{width:min(720px,100%);margin:auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:12px;margin-bottom:20px}.logo{width:54px;height:54px;border-radius:15px;box-shadow:0 4px 20px #0006}.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--cyan)}h1{font-size:21px;margin:2px 0 0}.card{background:linear-gradient(145deg,#122b54ee,#0c2042ee);border:1px solid var(--line);border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 10px 26px #0002}.muted{color:var(--muted)}.small{font-size:13px}.title{font-size:19px;font-weight:750;margin:0 0 8px}.btn{width:100%;border:1px solid var(--line);border-radius:13px;background:#142d59;color:var(--txt);padding:14px;text-align:left;font-size:15px;margin:5px 0;cursor:pointer}.btn:active{transform:scale(.99)}.btn.selected{
+ border:2px solid #67e8ff;
+ background:linear-gradient(135deg,#087eaa 0%,#245fba 55%,#5746a8 100%);
+ color:#fff;
+ font-weight:750;
+ box-shadow:0 0 0 2px #35c7f455,0 5px 18px #16bde755;
+}
+.btn.selected::after{
+ content:'✓ 選択中';
+ float:right;
+ margin-left:8px;
+ color:#d9fbff;
+ font-size:12px;
+ font-weight:800;
+}
+.btn:focus-visible{outline:3px solid #a7f3ff;outline-offset:2px}.primary{border:0;background:linear-gradient(90deg,#147fca,#6153c8);color:white;font-weight:750;text-align:center;margin-top:12px}.pill{font-size:11px;border:1px solid #42618e;border-radius:999px;padding:5px 9px;color:#c5d9f7}.topline{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px}.progress{height:7px;background:#20395f;border-radius:10px;overflow:hidden;margin:10px 0 14px}.progress>div{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));width:0}.target{font-size:24px;font-weight:800;line-height:1.35;margin:6px 0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.grid .btn{margin:0}.feedback{border-radius:13px;padding:13px;margin-top:12px;font-size:14px}.good{border:1px solid var(--green);background:#164b4166}.bad{border:1px solid var(--red);background:#602d3c66}.hidden{display:none!important}.center{text-align:center}.score{font-size:34px;font-weight:850}.footer{font-size:11px;color:var(--muted);text-align:center;margin:22px 0 5px}
+@media(max-width:380px){.grid{grid-template-columns:1fr}.target{font-size:21px}}
+</style>
+</head>
+<body>
+<main>
+<header><img class="logo" src="./icon-192.png" alt=""><div><div class="eyebrow">CHEMISTRY STUDY GAME</div><h1>高分子マスター</h1></div></header>
+<section id="home">
+ <div class="card"><p class="title">化学をゲームでマスターしよう</p><p class="muted small">材料・反応の種類・反応条件を選んで、高分子や糖類を組み立てよう！</p></div>
+ <button class="btn" data-cat="synthetic"><b>🧪 合成高分子</b><div class="muted small">合成樹脂・合成繊維・合成ゴムなど</div></button>
+ <button class="btn" data-cat="sugar"><b>🍬 糖類</b><div class="muted small">単糖・二糖・多糖</div></button>
+ <button class="btn" data-cat="all"><b>🌟 全カテゴリー</b><div class="muted small">すべての問題から出題</div></button>
+ <div class="card small"><b>遊び方</b><ol class="muted"><li>生成する物質を確認</li><li>必要な材料をすべて選ぶ</li><li>反応の種類を選ぶ</li><li>条件を「不要・酸・塩基」から選ぶ</li></ol><div class="muted">各問題の選択肢は最大5つ。結果から間違えた問題を復習できるよ。</div></div>
+</section>
+<section id="game" class="hidden">
+ <div class="topline"><span id="category" class="pill"></span><span id="count" class="muted"></span><b id="score">0点</b></div><div class="progress"><div id="bar"></div></div>
+ <div class="card"><div class="eyebrow">TARGET</div><div id="target" class="target"></div><div class="muted small">この物質をつくるために必要な材料・反応を答えよう。</div></div>
+ <div class="card"><b>① 材料を選ぼう</b><div class="muted small">複数選択可。必要な材料をすべて選んでね。</div><div id="materials" style="margin-top:12px"></div></div>
+ <div class="card"><b>② 反応の種類</b><div class="muted small">最も適切なものを1つ選択。</div><div id="reactions" style="margin-top:12px"></div></div>
+ <div class="card"><b>③ 反応条件</b><div class="muted small">酸・塩基を使うか、どちらも不要かを選ぼう。</div><div id="conditions" class="grid" style="margin-top:12px"></div></div>
+ <button id="check" class="btn primary">答え合わせ</button><div id="feedback" class="hidden"></div><button id="next" class="btn primary hidden">次の問題へ →</button>
+ <button id="back" class="btn center" style="text-align:center">カテゴリー選択に戻る</button>
+</section>
+<section id="result" class="hidden">
+ <div class="card center"><div class="eyebrow">CHALLENGE COMPLETE</div><div id="finalscore" class="score"></div><div id="message" class="muted small"></div></div>
+ <div class="card"><b>間違えた問題</b><div id="wrongs" class="small" style="margin-top:12px"></div></div>
+ <button id="review" class="btn primary">間違えた問題を復習する</button><button id="homebtn" class="btn center" style="text-align:center">カテゴリー選択へ戻る</button>
+</section>
+<div class="footer">高分子マスター · 無料学習ゲーム</div>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const Q=[
+{c:'synthetic',n:'ポリエチレン',m:['エチレン'],r:'付加重合',a:'不要',h:'エチレンの二重結合が開いて、鎖状につながる。'},
+{c:'synthetic',n:'ポリ塩化ビニル',m:['塩化ビニル'],r:'付加重合',a:'不要',h:'塩化ビニルの二重結合が開いて重合する。'},
+{c:'synthetic',n:'ポリスチレン',m:['スチレン'],r:'付加重合',a:'不要',h:'スチレンが付加重合してできる合成樹脂。'},
+{c:'synthetic',n:'ポリプロピレン',m:['プロピレン'],r:'付加重合',a:'不要',h:'プロピレンの二重結合が開いて重合する。'},
+{c:'synthetic',n:'ポリメタクリル酸メチル（アクリル樹脂）',m:['メタクリル酸メチル'],r:'付加重合',a:'不要',h:'メタクリル酸メチルの付加重合でできる。'},
+{c:'synthetic',n:'ポリアクリロニトリル',m:['アクリロニトリル'],r:'付加重合',a:'不要',h:'アクリロニトリルの付加重合でできる。'},
+{c:'synthetic',n:'SBR（合成ゴム）',m:['スチレン','1,3-ブタジエン'],r:'共重合',a:'不要',h:'スチレンと1,3-ブタジエンを共重合する。'},
+{c:'synthetic',n:'ナイロン66',m:['アジピン酸','ヘキサメチレンジアミン'],r:'脱水縮合',a:'不要',h:'ジカルボン酸とジアミンからアミド結合ができ、水が取れる。'},
+{c:'synthetic',n:'ナイロン6',m:['ε-カプロラクタム'],r:'開環重合',a:'不要',h:'環状のε-カプロラクタムが開環してつながる。'},
+{c:'synthetic',n:'PET（ポリエチレンテレフタラート）',m:['テレフタル酸','エチレングリコール'],r:'脱水縮合',a:'不要',h:'ジカルボン酸とジオールからエステル結合ができる。'},
+{c:'synthetic',n:'フェノール樹脂',m:['フェノール','ホルムアルデヒド'],r:'付加縮合',a:'酸',h:'フェノールとホルムアルデヒドから樹脂をつくる。反応条件によって酸性・塩基性の両方が使われる。ここでは酸性条件の例。'},
+{c:'synthetic',n:'尿素樹脂',m:['尿素','ホルムアルデヒド'],r:'付加縮合',a:'酸',h:'尿素とホルムアルデヒドが反応して樹脂になる。反応条件は製法によって異なる。'},
+{c:'synthetic',n:'メラミン樹脂',m:['メラミン','ホルムアルデヒド'],r:'付加縮合',a:'酸',h:'メラミンとホルムアルデヒドから網目状の樹脂ができる。'},
+{c:'synthetic',n:'ビニロン',m:['ポリビニルアルコール','ホルムアルデヒド'],r:'縮合（アセタール化）',a:'酸',h:'ポリビニルアルコールをホルムアルデヒドでアセタール化する。'},
+{c:'synthetic',n:'アラミド繊維',m:['p-フェニレンジアミン','テレフタル酸ジクロリド'],r:'縮合重合',a:'塩基',h:'芳香族ジアミンと酸塩化物からポリアミドをつくる。塩基は発生する塩化水素を中和する目的で使われる。'},
+{c:'synthetic',n:'ポリビニルアルコール',m:['酢酸ビニル'],r:'付加重合',a:'塩基',h:'酢酸ビニルを付加重合した後、けん化してポリビニルアルコールを得る。けん化には塩基を用いる。'},
+{c:'sugar',n:'デンプン',m:['α-グルコース'],r:'脱水縮合',a:'不要',h:'α-グルコースが多数つながった多糖。'},
+{c:'sugar',n:'セルロース',m:['β-グルコース'],r:'脱水縮合',a:'不要',h:'β-グルコースが多数つながった多糖。'},
+{c:'sugar',n:'グリコーゲン',m:['α-グルコース'],r:'脱水縮合',a:'不要',h:'α-グルコースが枝分かれの多い構造でつながった多糖。'},
+{c:'sugar',n:'マルトース（麦芽糖）',m:['グルコース'],r:'脱水縮合',a:'不要',h:'グルコース2分子からなる二糖。'},
+{c:'sugar',n:'スクロース（ショ糖）',m:['グルコース','フルクトース'],r:'脱水縮合',a:'不要',h:'グルコースとフルクトースからなる二糖。'},
+{c:'sugar',n:'ラクトース（乳糖）',m:['ガラクトース','グルコース'],r:'脱水縮合',a:'不要',h:'ガラクトースとグルコースからなる二糖。'}
+];
+const allM=[...new Set(Q.flatMap(q=>q.m))], reactions=['付加重合','共重合','縮合重合','脱水縮合','付加縮合','開環重合','縮合（アセタール化）'],conditions=['不要','酸','塩基'];
+const shuffle=a=>[...a].sort(()=>Math.random()-.5),same=(a,b)=>a.length===b.length&&a.every(x=>b.includes(x));
+let list=[],i=0,score=0,wrong=[],selM=[],selR='',selA='',locked=false,isReview=false;
+function screen(name){['home','game','result'].forEach(x=>$(x).classList.toggle('hidden',x!==name))}
+function makeBtn(label,selected,fn){let b=document.createElement('button');b.className='btn'+(selected?' selected':'');b.textContent=label;b.type='button';b.onclick=fn;return b}
+function start(cat,review=false){isReview=review;list=shuffle(review?wrong.map(x=>x.q):Q.filter(q=>cat==='all'||q.c===cat));i=0;score=0;wrong=[];screen('game');render()}
+function render(){
+let q=list[i];selM=[];selR='';selA='';locked=false;
+$('category').textContent=isReview?'復習':q.c==='sugar'?'糖類':'合成高分子';$('count').textContent=`${i+1} / ${list.length}`;$('score').textContent=`${score}点`;$('bar').style.width=`${i/list.length*100}%`;$('target').textContent=q.n;
+$('materials').innerHTML='';$('reactions').innerHTML='';$('conditions').innerHTML='';
+let ds=shuffle(allM.filter(x=>!q.m.includes(x))).slice(0,Math.max(0,5-q.m.length));
+shuffle([...q.m,...ds]).forEach(x=>$('materials').append(makeBtn(x,false,b=>{if(locked)return;selM=selM.includes(x)?selM.filter(y=>y!==x):[...selM,x];b.classList.toggle('selected',selM.includes(x))})));
+shuffle([q.r,...shuffle(reactions.filter(x=>x!==q.r)).slice(0,4)]).forEach(x=>$('reactions').append(makeBtn(x,false,b=>{if(locked)return;selR=x;[...$('reactions').children].forEach(e=>e.classList.toggle('selected',e===b))})));
+conditions.forEach(x=>$('conditions').append(makeBtn(x,false,b=>{if(locked)return;selA=x;[...$('conditions').children].forEach(e=>e.classList.toggle('selected',e===b))})));
+$('feedback').classList.add('hidden');$('feedback').innerHTML='';$('check').classList.remove('hidden');$('next').classList.add('hidden');
+}
+$('check').onclick=()=>{if(locked)return;if(!selM.length||!selR||!selA){$('feedback').className='feedback';$('feedback').textContent='材料・反応・条件をすべて選んでね。';return}
+locked=true;let q=list[i],ok=same(selM,q.m)&&selR===q.r&&selA===q.a;if(ok)score++;else wrong.push({q});
+$('score').textContent=`${score}点`;$('feedback').className='feedback '+(ok?'good':'bad');$('feedback').innerHTML=`<b>${ok?'正解！ 🎉':'不正解！'}</b><p>材料：${q.m.join(' ＋ ')}<br>反応：${q.r}<br>条件：${q.a}</p><b>解説</b><p class="muted">${q.h}</p>`;
+$('check').classList.add('hidden');$('next').classList.remove('hidden');$('next').textContent=i===list.length-1?'結果を見る':'次の問題へ →'};
+$('next').onclick=()=>{if(i<list.length-1){i++;render()}else finish()};
+function finish(){screen('result');$('finalscore').textContent=`${score} / ${list.length}`;$('message').textContent=`正答率 ${Math.round(score/list.length*100)}%。${score===list.length?'全問正解！すばらしい！':'間違えた問題を復習してみよう。'}`;$('wrongs').innerHTML=wrong.length?wrong.map((x,j)=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><b>${j+1}. ${x.q.n}</b><div class="muted">正解：${x.q.m.join(' ＋ ')} ／ ${x.q.r} ／ ${x.q.a}</div></div>`).join(''):'間違えた問題はありません！';$('review').disabled=!wrong.length}
+document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>start(b.dataset.cat));$('next').onclick=$('next').onclick;$('back').onclick=()=>screen('home');$('homebtn').onclick=()=>screen('home');$('review').onclick=()=>{if(wrong.length)start('all',true)};
+})();
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}</script>\n</body></html>
